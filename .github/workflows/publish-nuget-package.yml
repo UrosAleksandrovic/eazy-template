@@ -23,7 +23,7 @@ jobs:
         run: dotnet pack --configuration Release src/EazyTemplate/
       - name: Upload .nupkg artifact
         uses: actions/upload-artifact@v3
-         with:
+        with:
           name: dotnet-package-result
           path: src/EazyTemplate/bin/Release/*.nupkg
 
