@@ -1,4 +1,4 @@
-name: Publish NuGet Package
+name: Upload NuGet Package
 
 on:
   release:
@@ -53,14 +53,15 @@ jobs:
     name: 'Deploy to Nuget.org'
     needs: build_and_pack
     runs-on: ubuntu-latest
-    - uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: '6.0.x'
-    - name: Download NuGet artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: dotnet-package-result
-    - name: Publish the package to nuget.org
-      run: dotnet nuget push src/EazyTemplate/bin/Release/*.nupkg -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
-      env:
-        NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
+    steps:
+      - uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '6.0.x'
+      - name: Download NuGet artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: dotnet-package-result
+      - name: Publish the package to nuget.org
+        run: dotnet nuget push src/EazyTemplate/bin/Release/*.nupkg -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
