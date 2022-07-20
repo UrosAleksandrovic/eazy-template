@@ -1,6 +1,6 @@
 name: Pull Request Check
 on: 
-  pull-request:
+  pull_request:
     branches:
       - 'main'
       - 'dev'
