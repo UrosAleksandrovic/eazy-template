@@ -1,0 +1,66 @@
+name: Publish NuGet Package
+
+on:
+  release:
+    types: [created]
+
+jobs:
+
+  build_and_pack:
+    name: 'Build & Pack'
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '6.0.x'
+      - name: Build the project
+        run: dotnet build --configuration Release src/EazyTemplate/
+      - name: Create the package
+        run: dotnet pack --configuration Release src/EazyTemplate/
+      - name: Upload .nupkg artifact
+        uses: actions/upload-artifact@v3
+         with:
+          name: dotnet-package-result
+          path: src/EazyTemplate/bin/Release/*.nupkg
+
+  deploy_to_git:
+    name: 'Deploy to Git Packages'
+    needs: build_and_pack
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '6.0.x'
+          source-url: https://nuget.pkg.github.com/UrosAleksandrovic/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Download NuGet artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: dotnet-package-result
+      - name: Publish the package to GPR
+        run: dotnet nuget push src/EazyTemplate/bin/Release/*.nupkg
+  
+  deploy_on_nuget:
+    name: 'Deploy to Nuget.org'
+    needs: build_and_pack
+    runs-on: ubuntu-latest
+    - uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '6.0.x'
+    - name: Download NuGet artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: dotnet-package-result
+    - name: Publish the package to nuget.org
+      run: dotnet nuget push src/EazyTemplate/bin/Release/*.nupkg -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
