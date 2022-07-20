@@ -4,6 +4,11 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageProjectUrl>https://github.com/UrosAleksandrovic/eazy-template</PackageProjectUrl>
+    <Description>Reflection based library for populating any text template.</Description>
+    <RepositoryUrl>https://github.com/UrosAleksandrovic/eazy-template</RepositoryUrl>
+	<PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,4 +17,7 @@
     </AssemblyAttribute>
   </ItemGroup>
 
+  <ItemGroup>
+	<None Include="..\..\LICENSE" Pack="true" PackagePath=""/>
+  </ItemGroup>
 </Project>

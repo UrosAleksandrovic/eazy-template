@@ -1,6 +1,6 @@
 # Eazy Template
 
-Reflection based library for populating any text template
+Reflection based library for populating any text template.
 
 ## What is eazy template for?
 

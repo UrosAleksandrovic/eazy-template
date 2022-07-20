@@ -1,0 +1,25 @@
+name: Upload NuGet Package
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '6.0.x'
+          source-url: https://api.nuget.org/v3/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.NUGET_TOKEN}}
+      - run: dotnet build --configuration Release src/EazyTemplate/
+      - name: Create the package
+        run: dotnet pack --configuration Release src/EazyTemplate/
+      - name: Publish the package to GPR
+        run: dotnet nuget push src/EazyTemplate/bin/Release/*.nupkg
