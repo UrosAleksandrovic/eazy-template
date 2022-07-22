@@ -4,6 +4,7 @@ public class ParametersConfigBuilder : IParametersConfigBuilder
 {
     private string? _openingRegex;
     private string? _closingRegex;
+    private bool _emptyStringForUnknownProperties = false;
 
     public void UseOpeninAndClosingRegex(string openingRegex, string closingRegex)
     {
@@ -11,11 +12,21 @@ public class ParametersConfigBuilder : IParametersConfigBuilder
         _closingRegex = closingRegex;
     }
 
+    public void UseEmptyStringForUnKnownProperties()
+    {
+        _emptyStringForUnknownProperties = true;
+    }
+
     public ParametersConfig Build()
     {
-        if (_openingRegex != null && _closingRegex != null)
-            return new ParametersConfig(_openingRegex, _closingRegex);
+        var resultConfig = new ParametersConfig();
 
-        return new ParametersConfig();
+        if (_openingRegex != null && _closingRegex != null)
+            resultConfig= new ParametersConfig(_openingRegex, _closingRegex);
+
+        if (_emptyStringForUnknownProperties)
+            resultConfig.HandleUnknownParameters();
+
+        return resultConfig;
     }
 }

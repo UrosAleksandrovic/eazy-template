@@ -17,6 +17,8 @@ jobs:
       - uses: actions/setup-dotnet@v2
         with:
           dotnet-version: '6.0.x'
+        env:
+          VersionPrefix: ${{github.event.release.tag_name}}
       - name: Build the project
         run: dotnet build --configuration Release src/EazyTemplate/
       - name: Create the package
@@ -65,3 +67,4 @@ jobs:
         run: dotnet nuget push /home/runner/work/eazy-template/eazy-template/*.nupkg -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
+          VersionPrefix: ${{github.event.release.tag_name}}

@@ -53,4 +53,31 @@ public class ParametersConfigBuilderTest
         Assert.Equal(expectedResult.OpeningPattern, result.OpeningPattern);
         Assert.Equal(expectedResult.ClosingPattern, result.ClosingPattern);
     }
+
+    [Fact]
+    public void Build_HandleForUnknownPropertiesIsSet_BuildWithBoolPropSet()
+    {
+        //Arrange
+        var defaultBuilder = new ParametersConfigBuilder();
+        defaultBuilder.UseEmptyStringForUnKnownProperties();
+
+        //Act
+        var expectedResult = defaultBuilder.Build();
+
+        //Assert
+        Assert.True(expectedResult.PopulateUnknownParameters);
+    }
+
+    [Fact]
+    public void Build_DefaultConfig_BuildWithUnknownPropNotSet()
+    {
+        //Arrange
+        var defaultBuilder = new ParametersConfigBuilder();
+
+        //Act
+        var expectedResult = defaultBuilder.Build();
+
+        //Assert
+        Assert.False(expectedResult.PopulateUnknownParameters);
+    }
 }

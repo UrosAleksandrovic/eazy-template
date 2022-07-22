@@ -52,6 +52,8 @@ Here is some of the most important information for you:
 
 Simple parameters are properties that are of C# built in types. Essentially leaves of object trees. You declare them as *[[[parentName.propName]]]*
 
+By default all properties that might be in a template that builder cannot find will be returned as they are and template wont be populated on their place. To override this setting, *UseEmptyStringForUnKnownProperties()* of *ParameterConfigBulder* can be used. This instructs builder to populate unknown parameters with empty string.
+
 #### Complex parameters
 
 Complex parameters are parameters that have a template of their own. You can imagine nested objects or enumerables. If interaction through the list of some objects is needed, then creating complex parameters with templates is the solution. 

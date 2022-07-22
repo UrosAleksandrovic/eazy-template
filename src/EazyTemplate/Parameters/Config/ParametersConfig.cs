@@ -11,6 +11,7 @@ public class ParametersConfig
     public string ClosingRegex { get; private set; } = @"\]\]\]";
     public string OpeningPattern => Regex.Unescape(OpeningRegex);
     public string ClosingPattern => Regex.Unescape(ClosingRegex);
+    public bool PopulateUnknownParameters { get; private set; } = false;
 
     internal const string VariableNamePattern = "[A-Za-z_][A-Za-z0-9_]+";
     internal const string PropertyPattern = $"{VariableNamePattern}(\\.{VariableNamePattern})*";
@@ -32,5 +33,10 @@ public class ParametersConfig
 
         OpeningRegex = openingRegex;
         ClosingRegex = closingRegex;
+    }
+
+    public void HandleUnknownParameters()
+    {
+        PopulateUnknownParameters = true;
     }
 }

@@ -86,4 +86,27 @@ public class ParametersConfigTest
         Assert.Equal(Regex.Unescape(customOpeningRegex), paramConfig.OpeningPattern);
         Assert.Equal(Regex.Unescape(customClosingRegex), paramConfig.ClosingPattern);
     }
+
+    [Fact]
+    public void PopulateUnknownParameters_DefaultConstructor_SetToFalse()
+    {
+        //Arrange
+        var paramConfig = new ParametersConfig();
+
+        //Assert
+        Assert.False(paramConfig.PopulateUnknownParameters);
+    }
+
+    [Fact]
+    public void HandleUnknownParameters_SetsPropToTrue()
+    {
+        //Arrange
+        var paramConfig = new ParametersConfig();
+
+        //Act
+        paramConfig.HandleUnknownParameters();
+
+        //Assert
+        Assert.True(paramConfig.PopulateUnknownParameters);
+    }
 }

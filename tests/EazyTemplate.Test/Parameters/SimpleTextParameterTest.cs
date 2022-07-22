@@ -64,7 +64,7 @@ public class SimpleTextParameterTest
     }
 
     [Fact]
-    public void FindSimpleProperty_PropertyIsEnumerable_InvalidPropertyTypeException()
+    public void FindSimpleProperty_PropertyIsUnsupportedEnumerable_InvalidPropertyTypeException()
     {
         //Arrange
         var path = "root.EnumerableTest";
@@ -93,11 +93,11 @@ public class SimpleTextParameterTest
 
         //Assert
         var exception = Assert.Throws<InvalidPropertyTypeException>(a);
-        Assert.Equal("SimpleTextResolver does not support enumerable properties.", exception.Message);
+        Assert.Equal("SimpleTextResolver does not support enumerable properties on path.", exception.Message);
     }
 
     [Fact]
-    public void FindSimpleProperty_PropertyDoesNotExist_InvalidPropertyPathException()
+    public void FindSimpleProperty_PropertyDoesNotExist_ReturnsBothNulls()
     {
         //Arrange
         var path = "root.ThisDoesNotExist";
@@ -105,10 +105,28 @@ public class SimpleTextParameterTest
         var entity = new TestEntity("id");
 
         //Act
-        void a() => parameter.FindSimpleProperty(entity, typeof(TestEntity));
+        var result = parameter.FindSimpleProperty(entity, typeof(TestEntity));
 
         //Assert
-        Assert.Throws<InvalidPropertyPathException>(a);
+        Assert.Null(result.Item1);
+        Assert.Null(result.Item2);
+    }
+
+    [Fact]
+    public void FindSimpleProperty_PropertyOnThePathDoesNotExist_ReturnsBothNulls()
+    {
+        //Arrange
+        var path = "root.NestedExample.ThisDoesNotExist";
+        var parameter = new SimpleTextParameter(path, 0, path.Length + 6, _paramConfig, _evaluatorConfig);
+        var entity = new TestEntity("id");
+        entity.NestedExample = new TestEntity("id2");
+
+        //Act
+        var result = parameter.FindSimpleProperty(entity, typeof(TestEntity));
+
+        //Assert
+        Assert.Null(result.Item1);
+        Assert.Null(result.Item2);
     }
 
     [Fact]
@@ -146,7 +164,7 @@ public class SimpleTextParameterTest
     }
 
     [Fact]
-    public void FindSimpleProperty_ValueOnPathIsNull_ReturnsNullValue()
+    public void FindSimpleProperty_ValueOnPathIsNull_ReturnsNullValueWithType()
     {
         //Arrange
         var path = "root.NestedExample.Id";
@@ -158,10 +176,12 @@ public class SimpleTextParameterTest
 
         //Assert
         Assert.Null(result.Item1);
+        Assert.NotNull(result.Item2);
+        Assert.Equal(typeof(TestEntity), result.Item2.PropertyType);
     }
 
     [Fact]
-    public void FindSimpleProperty_ValueOfThePropertyIsNull_ReturnsNullValue()
+    public void FindSimpleProperty_ValueOfThePropertyIsNull_ReturnsNullValueWithType()
     {
         //Arrange
         var path = "root.NestedExample.NullTestProp";
@@ -174,10 +194,12 @@ public class SimpleTextParameterTest
 
         //Assert
         Assert.Null(result.Item1);
+        Assert.NotNull(result.Item2);
+        Assert.Equal(typeof(string), result.Item2.PropertyType);
     }
 
     [Fact]
-    public void Evaluate_RootIsNull_ReturnsEmptyString()
+    public void Evaluate_RootIsNull_ReturnsParameterText()
     {
         //Arrange
         var path = "root.EnumerableTest";
@@ -187,7 +209,7 @@ public class SimpleTextParameterTest
         var result = parameter.Evaluate(null, typeof(TestEntity));
 
         //Assert
-        Assert.Equal(string.Empty, result);
+        Assert.Equal("[[[root.EnumerableTest]]]", result);
     }
 
     [Fact]
@@ -206,5 +228,58 @@ public class SimpleTextParameterTest
 
         //Assert
         Assert.Equal(entity.EnumerableTest[1], result);
+    }
+
+    [Theory]
+    [InlineData("root.ThisDoesNotExist")]
+    [InlineData("root.NestedExample.ThisDeosNotExist")]
+    public void Evaluate_PropertyNotFound_PopulateUnknownParameters(string testInput)
+    {
+        //Arrange
+        var paramConfig = new ParametersConfig();
+        paramConfig.HandleUnknownParameters();
+        var parameter = new SimpleTextParameter(testInput, 0, testInput.Length + 6, paramConfig, _evaluatorConfig);
+        var entity = new TestEntity("SomeId");
+        entity.NestedExample = new TestEntity("SomeId2");
+
+        //Act
+        var result = parameter.Evaluate(entity, typeof(TestEntity));
+
+        //Assert
+        Assert.Equal(string.Empty, result);
+    }
+
+    [Theory]
+    [InlineData("root.ThisDoesNotExist")]
+    [InlineData("root.NestedExample.ThisDeosNotExist")]
+    public void Evaluate_PropertyNotFound_ReturnParameterText(string testInput)
+    {
+        //Arrange
+        var parameter = new SimpleTextParameter(testInput, 0, testInput.Length + 6, _paramConfig, _evaluatorConfig);
+        var entity = new TestEntity("SomeId");
+        entity.NestedExample = new TestEntity("SomeId2");
+
+        //Act
+        var result = parameter.Evaluate(entity, typeof(TestEntity));
+
+        //Assert
+        Assert.Equal($"[[[{testInput}]]]", result);
+
+    }
+
+    [Fact]
+    public void Evaluate_ValidPropertyPath_ReturnResultEvaluatedByEvaluatorConfig()
+    {
+        //Arrange
+        var path = "root.Id";
+        var parameter = new SimpleTextParameter(path, 0, path.Length + 6, _paramConfig, _evaluatorConfig);
+        var entity = new TestEntity("SomeId");
+        var expectedResult = _evaluatorConfig.GetForBuiltInType(entity.Id.GetType()).Invoke(entity.Id);
+
+        //Act
+        var result = parameter.Evaluate(entity, typeof(TestEntity));
+
+        //Assert
+        Assert.Equal(expectedResult, result);
     }
 }
