@@ -72,10 +72,10 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         var orderedParameters = GetOrderedChildParameters();
         var parameterValues = new List<string>();
 
-        if (propType!.IsAssignableTo(typeof(System.Collections.IEnumerable)))
+        if (propType!.IsAssignableTo(typeof(IEnumerable)))
         {
             var enumGenericType = propType.GetGenericArguments().Single();
-            foreach (var singleObject in ((System.Collections.IEnumerable)complexObject).Cast<object>())
+            foreach (var singleObject in ((IEnumerable)complexObject).Cast<object>())
                 parameterValues.AddRange(GetNestedValues(singleObject, orderedParameters, enumGenericType));
         }
         else

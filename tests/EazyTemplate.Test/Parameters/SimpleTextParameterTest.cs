@@ -177,7 +177,7 @@ public class SimpleTextParameterTest
         //Assert
         Assert.Null(result.Item1);
         Assert.NotNull(result.Item2);
-        Assert.Equal(typeof(string), result.Item2.PropertyType);
+        Assert.Equal(typeof(TestEntity), result.Item2.PropertyType);
     }
 
     [Fact]
