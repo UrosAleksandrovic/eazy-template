@@ -2,10 +2,10 @@
 using EazyTemplate.Evaluators;
 using EazyTemplate.Evaluators.Config;
 using EazyTemplate.Parameters.Config;
+using System.Collections;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using static EazyTemplate.Core.Constants;
 
 namespace EazyTemplate.Parameters;
 
@@ -49,19 +49,30 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         _parameterFactory = new TextParameterFactory(paramConfig, evaluatorConfig);
     }
 
+    private string ParameterText
+        => $"{ParamConfig.OpeningPattern}{PathFromParent}{ParametersConfig.DeclarationPattern}{DeclaredName}"
+          + $":{TextTemplate}:{PathFromParent}{ParamConfig.ClosingPattern}";
+
     public override string Evaluate(object? root, Type rootType)
     {
         if (root == null)
             throw new ArgumentNullException(nameof(root));
 
         var (complexObject, propType) = FindComplexProperty(root, rootType);
+        var propNotFound = complexObject == null && propType == null;
+        if (propNotFound && ParamConfig.PopulateUnknownParameters)
+            return string.Empty;
+
+        if (propNotFound)
+            return ParameterText;
+
         if (complexObject == default)
             return string.Empty;
 
         var orderedParameters = GetOrderedChildParameters();
         var parameterValues = new List<string>();
 
-        if (propType.IsAssignableTo(typeof(System.Collections.IEnumerable)))
+        if (propType!.IsAssignableTo(typeof(System.Collections.IEnumerable)))
         {
             var enumGenericType = propType.GetGenericArguments().Single();
             foreach (var singleObject in ((System.Collections.IEnumerable)complexObject).Cast<object>())
@@ -73,7 +84,7 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         return ConstructEndResult(parameterValues);
     }
 
-    public (object?, Type) FindComplexProperty(object root, Type rootType)
+    public (object?, Type?) FindComplexProperty(object root, Type rootType)
     {
         if (root == null)
             throw new ArgumentNullException(nameof(root));
@@ -95,7 +106,10 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         {
             currentProperty = rootType.GetProperty(propertyPath[currentLevel++]);
             if (currentProperty == null)
-                throw new InvalidPropertyPathException($"Property {PathFromParent} could not be found.");
+                return (null, null);
+
+            if (currentProperty.PropertyType.IsAssignableTo(typeof(IEnumerable)) && currentLevel < propertyPath.Length)
+                throw new InvalidPropertyTypeException("ComplexTextResolver does not support enumerable properties on path.");
 
             currentObject = currentProperty.GetValue(currentObject);
         }
