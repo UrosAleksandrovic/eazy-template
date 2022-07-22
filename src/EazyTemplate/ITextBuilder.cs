@@ -11,6 +11,11 @@ public interface ITextBuilder
     string BuildBody<T>(T root) where T : class;
 
     /// <summary>
+    /// Populates text template with properties from root anonymous object.
+    /// </summary>
+    string BuildBody(object root);
+
+    /// <summary>
     /// Sets text template to use when building result
     /// </summary>
     void HasTemplate(string textTemplate);

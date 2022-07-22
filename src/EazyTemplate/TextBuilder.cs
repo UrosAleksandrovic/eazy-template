@@ -28,6 +28,16 @@ public class TextBuilder : ITextBuilder
         return _rootElement.Evaluate(root, typeof(T));
     }
 
+    public string BuildBody(object root)
+    {
+        if (_textTemplate == default)
+            throw new InvalidOperationException("Template has to be provided to the builder.");
+
+        var _rootElement = new ComplexTextParameter(_textTemplate, _paramConfigBuilder.Build(), _textResolverConfigBuilder.Build());
+
+        return _rootElement.Evaluate(root, root.GetType());
+    }
+
     public void UseParametersConfiguration(Action<IParametersConfigBuilder> configBuilder)
     {
         configBuilder.Invoke(_paramConfigBuilder);

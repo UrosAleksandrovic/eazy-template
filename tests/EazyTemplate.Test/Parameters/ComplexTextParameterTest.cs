@@ -20,7 +20,7 @@ public class ComplexTextParameterTest
 
     [Theory]
     [InlineData("")]
-    [InlineDataAttribute(" ")]
+    [InlineData(" ")]
     [InlineData(null)]
     public void GetOrderedChildParameters_EmptyTemplate_EazyTempalteException(string testInput)
     {
@@ -210,23 +210,58 @@ public class ComplexTextParameterTest
     }
 
     [Fact]
-    public void FindComplexProperty_PropertyDoesNotExist_InvalidPropertyPathException()
+    public void FindComplexProperty_LeafPropertyDoesNotExist_ReturnBothNullValues()
     {
-        //Arrange
-        var testTemplate = "[[[root.ThisDoesNotExist as test: [[[test.Id]]], [[[test.CreatedOn as test2: test2.Month :test.ComplexTest]]] :root.ThisDoesNotExist]]]";
-        var complexParam = new ComplexTextParameter(testTemplate, _paramConfig, _evaluatorConfig);
+        //Arange
+        var complexParam = new ComplexTextParameter(
+               "root.NestedExample.ThisDoesNotExist"
+               , "test", "SomeTemplate", 0, 50, _paramConfig, _evaluatorConfig);
+        var entity = new TestEntity("TestId");
+        entity.NestedExample = new TestEntity("SomeId");
+
+        //Act
+        var result = complexParam.FindComplexProperty(entity, typeof(TestEntity));
+
+        //Assert
+        Assert.Null(result.Item1);
+        Assert.Null(result.Item2);
+    }
+
+    [Fact]
+    public void FindComplexProperty_PropertyOnPathDoesNotExist_ReturnBothNullValues()
+    {
+        //Arange
+        var complexParam = new ComplexTextParameter(
+               "root.ThisDoesNotExist.EnumerableTest"
+               , "test", "SomeTemplate", 0, 50, _paramConfig, _evaluatorConfig);
         var entity = new TestEntity("TestId");
 
         //Act
         var result = complexParam.FindComplexProperty(entity, typeof(TestEntity));
 
         //Assert
-        Assert.Equal(result.Item1, entity);
-        Assert.Equal(typeof(TestEntity), result.Item2);
+        Assert.Null(result.Item1);
+        Assert.Null(result.Item2);
     }
 
     [Fact]
-    public void FindComplexProperty_PropertyHasNullValue_NullValueReturned()
+    public void FindComplexProperty_EnumerablePropertyOnThePath_InvalidPropertyTypeException()
+    {
+        //Arange
+         var complexParam = new ComplexTextParameter(
+                "root.EnumerableTest.Something"
+                , "test", "SomeTemplate", 0,50, _paramConfig, _evaluatorConfig);
+        var entity = new TestEntity("TestId");
+
+        //Act
+        void a() => complexParam.FindComplexProperty(entity, typeof(TestEntity));
+
+        //Assert
+        Assert.Throws<InvalidPropertyTypeException>(a);
+    }
+
+    [Fact]
+    public void FindComplexProperty_PropertyHasNullValue_NullValueReturnedWithType()
     {
         //Arrange
         var testTemplate = "[[[test.Id]]], [[[test.CreatedOn as test2: test2.Month :test.ComplexTest]]]";
@@ -240,5 +275,66 @@ public class ComplexTextParameterTest
         //Assert
         Assert.Null(result.Item1);
         Assert.Equal(typeof(string), result.Item2);
+    }
+
+    [Fact]
+    public void Evaluate_RootIsNull_ArgumentNullException()
+    {
+        //Arrange
+        var template = "[[[root.Id]]]";
+        var complexParam = new ComplexTextParameter(template, _paramConfig, _evaluatorConfig);
+
+        //Act
+        void a() => complexParam.Evaluate(null, typeof(TestEntity));
+
+        //Assert
+        Assert.Throws<ArgumentNullException>(a);
+    }
+
+    [Fact]
+    public void Evaluate_PropertyDoesNotExist_ReturnParameterText()
+    {
+        //Arrange
+        var template = "[[[root.ThisDoesNotExist as test:TestTemplate:root.ThisDoesNotExist]]]";
+        var complexParam = new ComplexTextParameter(template, _paramConfig, _evaluatorConfig);
+
+        //Act
+        var result = complexParam.Evaluate(new TestEntity("someId"), typeof(TestEntity));
+
+        //Assert
+        Assert.Equal(template, result);
+    }
+
+    [Fact]
+    public void Evaluate_PropertyDoesNotExist_ReturnEmptyString()
+    {
+        //Arrange
+        var parameterConfig = new ParametersConfig();
+        parameterConfig.HandleUnknownParameters();
+        var template = "[[[root.ThisDoesNotExist as test:TestTemplate:root.ThisDoesNotExist]]]";
+        var complexParam = new ComplexTextParameter(template, parameterConfig, _evaluatorConfig);
+
+        //Act
+        var result = complexParam.Evaluate(new TestEntity("someId"), typeof(TestEntity));
+
+        //Assert
+        Assert.Equal(string.Empty, result);
+    }
+
+    [Fact]
+    public void Evaluate_PropertyValueIsNull_ReturnEmptyString()
+    {
+        //Arrange
+        var parameterConfig = new ParametersConfig();
+        parameterConfig.HandleUnknownParameters();
+        var complexParam = new ComplexTextParameter(
+               "root.NullTestProp"
+               , "test", "SomeTemplate", 0, 50, _paramConfig, _evaluatorConfig);
+
+        //Act
+        var result = complexParam.Evaluate(new TestEntity("someId"), typeof(TestEntity));
+
+        //Assert
+        Assert.Equal(string.Empty, result);
     }
 }

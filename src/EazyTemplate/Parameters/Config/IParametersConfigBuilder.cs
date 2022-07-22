@@ -8,6 +8,11 @@ public interface IParametersConfigBuilder
     void UseOpeninAndClosingRegex(string openingRegex, string closingRegex);
 
     /// <summary>
+    /// If parameter cannot be found in the root project then it is populated with empty string.
+    /// </summary>
+    void UseEmptyStringForUnKnownProperties();
+
+    /// <summary>
     /// Builds configuration used by text builder.
     /// </summary>
     /// <remarks>
