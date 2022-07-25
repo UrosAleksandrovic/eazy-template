@@ -24,7 +24,7 @@ public class SimpleTextParameter : TextParameter
 
     private string ParameterText => $"{ParamConfig.OpeningPattern}{PathFromParent}{ParamConfig.ClosingPattern}";
 
-    public (object?, PropertyInfo?) FindSimpleProperty(object root, Type rootType)
+    public (object?, Type?) FindSimpleProperty(object root, Type rootType)
     {
         if (root == null)
             throw new ArgumentNullException(nameof(root));
@@ -37,11 +37,11 @@ public class SimpleTextParameter : TextParameter
             throw new InvalidPropertyPathException($"Property path must have root attribute.");
 
         object? currentObject = root;
-        PropertyInfo? currentProperty = null;
+        Type currentType = rootType;
         short currentLevel = 1;
         while (currentLevel < propertyPath.Length && currentObject != null)
         {
-            currentProperty = rootType.GetProperty(propertyPath[currentLevel++]);
+            var currentProperty = currentType.GetProperty(propertyPath[currentLevel++]);
             if (currentProperty == null)
                 return (null, null);
 
@@ -49,12 +49,13 @@ public class SimpleTextParameter : TextParameter
                 throw new InvalidPropertyTypeException("SimpleTextResolver does not support enumerable properties on path.");
             
             currentObject = currentProperty.GetValue(currentObject);
+            currentType = currentProperty.PropertyType;
         }
 
-        if (currentObject != null && !SupportedTypes.Contains(currentProperty!.PropertyType))
-            throw new InvalidPropertyTypeException($"Property type {currentProperty.PropertyType} is not supported for by SimpleTextResolver.");
+        if (currentObject != null && !SupportedTypes.Contains(currentType))
+            throw new InvalidPropertyTypeException($"Property type {currentType} is not supported for by SimpleTextResolver.");
 
-        return (currentObject, currentProperty);
+        return (currentObject, currentType);
     }
 
     public override string Evaluate(object? root, Type rootType)
@@ -70,8 +71,8 @@ public class SimpleTextParameter : TextParameter
         if (SupportedTypes.Contains(rootType) && Name.ToLowerInvariant() == "value")
             return ResolverConfig.GetForBuiltInType(rootType).Invoke(root);
 
-        var (evaluatedObject, evaluatedProperty) = FindSimpleProperty(root, rootType);
-        var propNotFound = evaluatedObject == null && evaluatedProperty == null;
+        var (evaluatedObject, evaluatedType) = FindSimpleProperty(root, rootType);
+        var propNotFound = evaluatedObject == null && evaluatedType == null;
 
         if (propNotFound && ParamConfig.PopulateUnknownParameters)
             return string.Empty;
@@ -79,6 +80,6 @@ public class SimpleTextParameter : TextParameter
         if (propNotFound)
             return ParameterText;
 
-        return ResolverConfig.GetForBuiltInType(evaluatedProperty!.PropertyType).Invoke(evaluatedObject);
+        return ResolverConfig.GetForBuiltInType(evaluatedType!).Invoke(evaluatedObject);
     }
 }

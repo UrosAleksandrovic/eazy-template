@@ -100,11 +100,11 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
             return (root, rootType);
 
         object? currentObject = root;
-        PropertyInfo? currentProperty = null;
+        Type currentType = rootType;
         short currentLevel = 1;
         while (currentLevel < propertyPath.Length && currentObject != null)
         {
-            currentProperty = rootType.GetProperty(propertyPath[currentLevel++]);
+            var currentProperty = currentType.GetProperty(propertyPath[currentLevel++]);
             if (currentProperty == null)
                 return (null, null);
 
@@ -112,9 +112,10 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
                 throw new InvalidPropertyTypeException("ComplexTextResolver does not support enumerable properties on path.");
 
             currentObject = currentProperty.GetValue(currentObject);
+            currentType = currentProperty.PropertyType;
         }
 
-        return (currentObject, currentProperty!.PropertyType);
+        return (currentObject, currentType);
     }
 
     public List<TextParameter> GetOrderedChildParameters()
