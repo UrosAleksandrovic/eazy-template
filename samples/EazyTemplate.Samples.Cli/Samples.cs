@@ -124,8 +124,8 @@ public static class Samples
 
         textBuilder.UseTextEvaluatorConfig(cfg =>
         {
-            cfg.UseTypeResolver<DateTime>(dt => ((DateTime)dt!).ToString("dd/MMM/yy z"));
-            cfg.UseTypeResolver<bool>(dt => ((bool)dt!) ? "Awesome" : "Bad");
+            cfg.UseTypeResolver<DateTime>(dt => dt.ToString("dd/MMM/yy z"));
+            cfg.UseTypeResolver<bool>(dt => dt ? "Awesome" : "Bad");
         });
         textBuilder.HasTemplate(textTemplate);
         var result = textBuilder.BuildBody(testObject);

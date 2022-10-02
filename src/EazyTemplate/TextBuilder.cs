@@ -43,8 +43,8 @@ public class TextBuilder : ITextBuilder
         configBuilder.Invoke(_paramConfigBuilder);
     }
 
-    public void UseTextEvaluatorConfig(Action<ITextEvaluatorConfigBuilder> configBuilder)
+    public void UseTextEvaluatorConfig(Action<ITextEvaluatorConfigurator> configurator)
     {
-        configBuilder.Invoke(_textResolverConfigBuilder);
+        configurator.Invoke(_textResolverConfigBuilder);
     }
 }

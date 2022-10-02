@@ -28,5 +28,5 @@ public interface ITextBuilder
     /// <summary>
     /// Configures evaluators config.
     /// </summary>
-    void UseTextEvaluatorConfig(Action<ITextEvaluatorConfigBuilder> configBuilder);
+    void UseTextEvaluatorConfig(Action<ITextEvaluatorConfigurator> configurator);
 }

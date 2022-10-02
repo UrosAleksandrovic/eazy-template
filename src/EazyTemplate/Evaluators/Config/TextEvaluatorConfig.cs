@@ -11,33 +11,36 @@ namespace EazyTemplate.Evaluators.Config;
 /// </remarks>
 public class TextEvaluatorConfig
 {
-    private readonly Dictionary<string, Func<object?, string>> _builtInTypeResolvers = new();
+    private readonly Dictionary<string, ITextEvaluatorWrapper> _builtInTypeResolvers = new();
 
     internal TextEvaluatorConfig() { }
 
-    internal TextEvaluatorConfig(List<(Type, Func<object?, string>)> builtInTypeResolvers)
+    internal TextEvaluatorConfig(List<ITextEvaluatorWrapper> builtInTypeResolvers)
     {
         foreach (var resolver in builtInTypeResolvers)
-            AddBuiltInTypeResolver(resolver.Item1, resolver.Item2);
+            AddBuiltInTypeResolver(resolver.GetResolverType(), resolver);
     }
 
     /// <summary>
     /// Get's resolver function for requested type.
     /// </summary>
-    public Func<object?, string> GetForBuiltInType(Type type)
+    public ITextEvaluatorWrapper GetForBuiltInType(Type type)
     {
         if (_builtInTypeResolvers.TryGetValue(type.Name, out var result))
             return result;
 
-        return value => value == default ? string.Empty : value.ToString() ?? string.Empty;
+        return new TextEvaluatorWrapper<object?>(value =>
+            value == default 
+                ? string.Empty 
+                : value.ToString() ?? string.Empty);
     }
 
-    private void AddBuiltInTypeResolver(Type builtInType, Func<object?, string> resolveFunction)
+    private void AddBuiltInTypeResolver(Type builtInType, ITextEvaluatorWrapper resolverWrapper)
     {
         if (!SupportedTypes.Contains(builtInType))
             throw new EazyTemplateException($"This type is not yet supported.");
 
-        if (!_builtInTypeResolvers.TryAdd(builtInType.Name, resolveFunction))
+        if (!_builtInTypeResolvers.TryAdd(builtInType.Name, resolverWrapper))
             throw new EazyTemplateException($"Could not configure for type {builtInType.Name}.");
     }
 }

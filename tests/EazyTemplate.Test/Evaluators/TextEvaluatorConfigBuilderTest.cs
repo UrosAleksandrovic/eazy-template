@@ -11,8 +11,8 @@ public class TextEvaluatorConfigBuilderTest
     {
         //Arrange
         var builder = new TextEvaluatorConfigBuilder();
-        builder.UseTypeResolver<int>((v) => string.Empty);
-        builder.UseTypeResolver<int>((v) => string.Empty);
+        builder.UseTypeResolver<int>(v => string.Empty);
+        builder.UseTypeResolver<int>(v => string.Empty);
 
         //Assert
         Assert.Equal(2, builder.RegisteredTypes.Count);
@@ -23,12 +23,16 @@ public class TextEvaluatorConfigBuilderTest
     {
         //Arrange
         var builder = new TextEvaluatorConfigBuilder();
-        builder.UseTypeResolver<DateTime>((v) => string.Empty);
-        builder.UseTypeResolver<int>((v) => string.Empty);
-        builder.UseTypeResolver<decimal>((v) => string.Empty);
+        builder.UseTypeResolver<DateTime>(v => string.Empty);
+        builder.UseTypeResolver<int>(v => string.Empty);
+        builder.UseTypeResolver<decimal>(v => string.Empty);
 
         //Assert
-        Assert.Equal(3, builder.RegisteredTypes.Count);
+        var registeredTypes = builder.RegisteredTypes;
+        Assert.Equal(3, registeredTypes.Count);
+        Assert.Contains(typeof(DateTime), registeredTypes);
+        Assert.Contains(typeof(int), registeredTypes);
+        Assert.Contains(typeof(decimal), registeredTypes);
     }
 
     [Fact]
@@ -36,9 +40,9 @@ public class TextEvaluatorConfigBuilderTest
     {
         //Arrange
         var builder = new TextEvaluatorConfigBuilder();
-        builder.UseTypeResolver<DateTime>((v) => string.Empty);
-        builder.UseTypeResolver<int>((v) => string.Empty);
-        builder.UseTypeResolver<decimal>((v) => string.Empty);
+        builder.UseTypeResolver<DateTime>(v => string.Empty);
+        builder.UseTypeResolver<int>(v => string.Empty);
+        builder.UseTypeResolver<decimal>(v => string.Empty);
 
         //Act
         var result = builder!.Build();
