@@ -3,7 +3,7 @@ using EazyTemplate.Evaluators;
 using EazyTemplate.Evaluators.Config;
 using EazyTemplate.Parameters.Config;
 using System.Collections;
-using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -74,7 +74,9 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
 
         if (propType!.IsAssignableTo(typeof(IEnumerable)))
         {
-            var enumGenericType = propType.GetGenericArguments().Single();
+            var enumGenericType = propType.IsArray 
+                    ? propType.GetElementType()!
+                    : propType.GetGenericArguments().Single();
             foreach (var singleObject in ((IEnumerable)complexObject).Cast<object>())
                 parameterValues.AddRange(GetNestedValues(singleObject, orderedParameters, enumGenericType));
         }
@@ -118,6 +120,9 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         return (currentObject, currentType);
     }
 
+    [SuppressMessage(
+        "Major Code Smell", "S2589:Boolean expressions should not be gratuitous",
+        Justification = "False positive")]
     public List<TextParameter> GetOrderedChildParameters()
     {
         var simpleEnumerator = GetSimpleChildrenEnumerator();
@@ -217,6 +222,7 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         var stringBuilder = new StringBuilder();
         foreach (var value in paramValues)
             stringBuilder.Append(value);
+
         return stringBuilder.ToString();
     }
 }

@@ -6,7 +6,7 @@ namespace EazyTemplate;
 
 public class TextBuilder : ITextBuilder
 {
-    private string? _textTemplate;
+    private string _textTemplate = string.Empty;
     private readonly ParametersConfigBuilder _paramConfigBuilder = new();
     private readonly TextEvaluatorConfigBuilder _textResolverConfigBuilder = new();
 
@@ -20,20 +20,20 @@ public class TextBuilder : ITextBuilder
 
     public string BuildBody<T>(T root) where T : class
     {
-        if (_textTemplate == default)
-            throw new InvalidOperationException("Template has to be provided to the builder.");
-
-        var _rootElement = new ComplexTextParameter(_textTemplate, _paramConfigBuilder.Build(), _textResolverConfigBuilder.Build());
+        var _rootElement = new ComplexTextParameter(
+            _textTemplate,
+            _paramConfigBuilder.Build(),
+            _textResolverConfigBuilder.Build());
 
         return _rootElement.Evaluate(root, typeof(T));
     }
 
     public string BuildBody(object root)
     {
-        if (_textTemplate == default)
-            throw new InvalidOperationException("Template has to be provided to the builder.");
-
-        var _rootElement = new ComplexTextParameter(_textTemplate, _paramConfigBuilder.Build(), _textResolverConfigBuilder.Build());
+        var _rootElement = new ComplexTextParameter(
+            _textTemplate,
+            _paramConfigBuilder.Build(),
+            _textResolverConfigBuilder.Build());
 
         return _rootElement.Evaluate(root, root.GetType());
     }

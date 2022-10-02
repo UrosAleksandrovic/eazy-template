@@ -2,9 +2,9 @@
 
 public class TextEvaluatorConfigBuilder : ITextEvaluatorConfigBuilder
 {
-    private readonly List<(Type, Func<object?, string>)> _builtInTypeResolvers = new();
+    private readonly List<(Type Type, Func<object?, string> ResolverFunction)> _builtInTypeResolvers = new();
 
-    public IReadOnlyList<Type> RegisteredTypes => _builtInTypeResolvers.Select(v => v.Item1).ToList().AsReadOnly();
+    public IReadOnlyList<Type> RegisteredTypes => _builtInTypeResolvers.Select(v => v.Type).ToList().AsReadOnly();
 
     public TextEvaluatorConfig Build() => new(_builtInTypeResolvers);
 
