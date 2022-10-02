@@ -54,5 +54,4 @@ internal class TextParameterFactory : ITextParameterFactory
 
     private string ConstructEndingPatternForPath(string fullPath) 
         => $":{fullPath}{_paramConfig.ClosingPattern}";
-
 }

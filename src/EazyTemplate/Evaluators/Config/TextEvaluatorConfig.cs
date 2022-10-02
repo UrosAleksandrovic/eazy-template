@@ -1,13 +1,13 @@
-﻿namespace EazyTemplate.Evaluators.Config;
-
-using EazyTemplate.Core;
+﻿using EazyTemplate.Core;
 using static EazyTemplate.Core.Constants;
+
+namespace EazyTemplate.Evaluators.Config;
 
 /// <summary>
 /// Configuration that provides resolver functions to transfer from Built in types to string values for template.
 /// </summary>
 /// <remarks>
-/// Default resolver function calls ToString and if null returns empty string.
+/// Default resolver function calls ToString and if default returns empty string.
 /// </remarks>
 public class TextEvaluatorConfig
 {
@@ -21,6 +21,9 @@ public class TextEvaluatorConfig
             AddBuiltInTypeResolver(resolver.Item1, resolver.Item2);
     }
 
+    /// <summary>
+    /// Get's resolver function for requested type.
+    /// </summary>
     public Func<object?, string> GetForBuiltInType(Type type)
     {
         if (_builtInTypeResolvers.TryGetValue(type.Name, out var result))
