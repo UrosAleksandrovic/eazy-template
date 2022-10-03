@@ -1,5 +1,6 @@
 ﻿namespace EazyTemplate.Parameters.Config;
 
+/// <inheritdoc />
 public class ParametersConfigBuilder : IParametersConfigBuilder
 {
     private string? _openingRegex;
@@ -12,11 +13,13 @@ public class ParametersConfigBuilder : IParametersConfigBuilder
         _closingRegex = closingRegex;
     }
 
+    /// <inherithdoc />
     public void UseEmptyStringForUnKnownProperties()
     {
         _emptyStringForUnknownProperties = true;
     }
 
+    /// <inherithdoc />
     public ParametersConfig Build()
     {
         var resultConfig = new ParametersConfig();

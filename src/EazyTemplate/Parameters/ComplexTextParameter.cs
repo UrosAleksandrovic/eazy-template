@@ -9,6 +9,9 @@ using System.Text.RegularExpressions;
 
 namespace EazyTemplate.Parameters;
 
+/// <summary>
+/// Represents complex text parameter caught in the template. Complex parameters have their own template.
+/// </summary>
 public class ComplexTextParameter : TextParameter, ITextEvaluator
 {
     private readonly ITextParameterFactory _parameterFactory;

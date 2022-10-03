@@ -4,6 +4,9 @@ using EazyTemplate.Evaluators.Config;
 
 namespace EazyTemplate.Parameters;
 
+/// <summary>
+/// Represents parameter that is caught in passed template.
+/// </summary>
 public abstract class TextParameter : ITextEvaluator
 {
     protected string PathFromParent { get; init; }

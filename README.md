@@ -1,5 +1,7 @@
 # Eazy Template
 
+![NuGet publishing](https://github.com/UrosAleksandrovic/eazy-template/actions/workflows/publish-nuget-package.yml/badge.svg)
+
 Reflection based library for populating any text template.
 
 ## What is eazy template for?
@@ -14,7 +16,7 @@ The project aims to take care of reflection for the user. All that the user need
 ## How to use it?
 
 In order to populate a template, you need to instantiate TextBuilder. TextBuilder is configurable with some basic options. Hopefully, with more to come in the future. :blush:
-```
+```csharp
     var textBuilder = new TextBuilder();
 
     textBuilder.UseTextEvaluatorConfig(cfg =>
@@ -33,12 +35,23 @@ In the code example above, textBuilder is configured to handle boolean type prop
 
 Another configuration is for opening and closing regex, used to find parameters in the text. By default, parameters are opened with **[[[** and closed with **]]]** but as the example shows, this is configurable to anything really. ex. **(((** and **)))**
 
-```
+```csharp
     textBuilder.HasTemplate(textTemplate);
 
     textBuilder.Build(object);
 ```
 After configuration, all that is needed is to pass the text template and object that populates it. This is why eazy template is called **eazy**. Nothing more to have in the code. No Regex, no reflection to handle. :blush:
+
+Full usage example. For more examples take a look at [samples](/samples/EazyTemplate.Samples.Cli) created for demonstration purposes.
+```csharp
+    var textTemplate = "This is our simple parameter [[[root.SimpleParameter]]]";
+
+    var testObject = new { SimpleParameter = "Hello world, I am simple property!" };
+
+    var textBuilder = new TextBuilder();
+    textBuilder.HasTemplate(textTemplate);
+    var result = textBuilder.BuildBody(testObject);
+```
 
 ## Preparing template
 
