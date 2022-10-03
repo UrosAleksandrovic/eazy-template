@@ -6,7 +6,7 @@ public class ParametersConfigBuilder : IParametersConfigBuilder
     private string? _closingRegex;
     private bool _emptyStringForUnknownProperties = false;
 
-    public void UseOpeninAndClosingRegex(string openingRegex, string closingRegex)
+    public void UseOpeningAndClosingRegex(string openingRegex, string closingRegex)
     {
         _openingRegex = openingRegex;
         _closingRegex = closingRegex;

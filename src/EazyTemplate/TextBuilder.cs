@@ -20,25 +20,25 @@ public class TextBuilder : ITextBuilder
 
     public string BuildBody<T>(T root) where T : class
     {
-        var _rootElement = new ComplexTextParameter(
+        var rootElement = new ComplexTextParameter(
             _textTemplate,
             _paramConfigBuilder.Build(),
             _textResolverConfigBuilder.Build());
 
-        return _rootElement.Evaluate(root, typeof(T));
+        return rootElement.Evaluate(root, typeof(T));
     }
 
     public string BuildBody(object root)
     {
-        var _rootElement = new ComplexTextParameter(
+        var rootElement = new ComplexTextParameter(
             _textTemplate,
             _paramConfigBuilder.Build(),
             _textResolverConfigBuilder.Build());
 
-        return _rootElement.Evaluate(root, root.GetType());
+        return rootElement.Evaluate(root, root.GetType());
     }
 
-    public void UseParametersConfiguration(Action<IParametersConfigBuilder> configBuilder)
+    public void UseParametersConfiguration(Action<IParametersConfigurator> configBuilder)
     {
         configBuilder.Invoke(_paramConfigBuilder);
     }

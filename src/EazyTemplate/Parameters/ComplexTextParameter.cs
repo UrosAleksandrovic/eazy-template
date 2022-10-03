@@ -13,9 +13,9 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
 {
     private readonly ITextParameterFactory _parameterFactory;
 
-    public string TextTemplate { get; private set; }
+    private string TextTemplate { get; }
 
-    public string DeclaredName { get; private set; }
+    private string DeclaredName { get; }
 
     public ComplexTextParameter(
         string fullPath,
@@ -158,7 +158,7 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         return parameters;
     }
 
-    protected IEnumerator<SimpleTextParameter> GetSimpleChildrenEnumerator()
+    private IEnumerator<SimpleTextParameter> GetSimpleChildrenEnumerator()
     {
         if (string.IsNullOrWhiteSpace(TextTemplate))
             throw new EazyTemplateException("No text template is provided.");
@@ -178,7 +178,7 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         }
     }
 
-    protected IEnumerator<ComplexTextParameter> GetComplexChildrenEnumerator()
+    private IEnumerator<ComplexTextParameter> GetComplexChildrenEnumerator()
     {
         if (string.IsNullOrWhiteSpace(TextTemplate))
             throw new EazyTemplateException("No text template is provided.");
@@ -198,7 +198,7 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         }
     }
 
-    protected List<string> GetNestedValues(object root, IEnumerable<TextParameter> textParameters, Type rootType)
+    private List<string> GetNestedValues(object root, IEnumerable<TextParameter> textParameters, Type rootType)
     {
         var stringResults = new List<string>();
         var lastEndingIndex = 0;
@@ -217,7 +217,7 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         return stringResults;
     }
 
-    protected string ConstructEndResult(IEnumerable<string> paramValues)
+    private string ConstructEndResult(IEnumerable<string> paramValues)
     {
         var stringBuilder = new StringBuilder();
         foreach (var value in paramValues)

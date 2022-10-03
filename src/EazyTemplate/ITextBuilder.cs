@@ -23,7 +23,7 @@ public interface ITextBuilder
     /// <summary>
     /// Configures parameters config.
     /// </summary>
-    void UseParametersConfiguration(Action<IParametersConfigBuilder> configBuilder);
+    void UseParametersConfiguration(Action<IParametersConfigurator> configBuilder);
 
     /// <summary>
     /// Configures evaluators config.

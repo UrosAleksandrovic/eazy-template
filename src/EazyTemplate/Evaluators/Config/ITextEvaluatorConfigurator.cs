@@ -1,7 +1,7 @@
 ﻿namespace EazyTemplate.Evaluators.Config;
 
 /// <summary>
-/// Abstraction of the cofigurator, internally used to instantiate configuration.
+/// Abstraction of the configurator, internally used to instantiate configuration.
 /// Text Evaluator Config Configurator is only for directives on how to resolve certain types and properties to end result.
 /// </summary>
 public interface ITextEvaluatorConfigurator

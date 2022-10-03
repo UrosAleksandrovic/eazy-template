@@ -22,7 +22,7 @@ public class TextEvaluatorConfig
     }
 
     /// <summary>
-    /// Get's resolver function for requested type.
+    /// Gets resolver function for requested type. If not found, default resolver wrapper is returned.
     /// </summary>
     public ITextEvaluatorWrapper GetForBuiltInType(Type type)
     {

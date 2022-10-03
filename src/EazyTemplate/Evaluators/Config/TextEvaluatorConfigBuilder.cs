@@ -6,7 +6,7 @@ public class TextEvaluatorConfigBuilder : ITextEvaluatorConfigBuilder
 
     public IReadOnlyList<Type> RegisteredTypes => 
         _builtInTypeResolvers.Select(v => v.GetResolverType()).ToList().AsReadOnly();
-
+    
     public TextEvaluatorConfig Build() => new(_builtInTypeResolvers);
 
     public void UseTypeResolver<T>(Func<T, string> typeResolver) 

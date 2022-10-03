@@ -20,7 +20,10 @@ internal class TextParameterFactory : ITextParameterFactory
         var (fullPath, declaredName) = ExtractPathAndName(regexMatch.ValueSpan);
         var endingPattern = ConstructEndingPatternForPath(fullPath);
 
-        var complexParamBodyEndIndex = parentTemplate.IndexOf(endingPattern, regexMatch.Index);
+        var complexParamBodyEndIndex = parentTemplate.IndexOf(endingPattern,
+            regexMatch.Index,
+            StringComparison.Ordinal);
+        
         var complexParamBodyStartIndex = regexMatch.Index + regexMatch.Length;
         var complexParamBody = parentTemplate[complexParamBodyStartIndex..complexParamBodyEndIndex];
 
@@ -34,8 +37,7 @@ internal class TextParameterFactory : ITextParameterFactory
             _evaluatorConfig);
     }
 
-    public SimpleTextParameter CreateSimpleParameter(
-        Match regexMatch)
+    public SimpleTextParameter CreateSimpleParameter(Match regexMatch)
         => new(
             regexMatch.ValueSpan[_paramConfig.OpeningPattern.Length..^_paramConfig.ClosingPattern.Length].ToString(),
             regexMatch.Index,

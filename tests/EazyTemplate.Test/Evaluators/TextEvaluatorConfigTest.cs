@@ -2,6 +2,7 @@
 using EazyTemplate.Evaluators.Config;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Xunit;
 
 namespace EazyTemplate.Test.Evaluators;
@@ -12,10 +13,9 @@ public class TextEvaluatorConfigTest
     public void GetForBuiltInType_HasRegisteredFunction_FindsProperFunction()
     {
         //Arrange
-        var expectedFunction = (DateTime value) => value.ToString();
+        var expectedFunction = (DateTime value) => value.ToString(CultureInfo.InvariantCulture);
         var listOfResolvers = new List<ITextEvaluatorWrapper>();
         listOfResolvers.Add(new TextEvaluatorWrapper<DateTime>(expectedFunction));
-
         var evaluatorConfig = new TextEvaluatorConfig(listOfResolvers);
         var testDate = DateTime.UtcNow;
 

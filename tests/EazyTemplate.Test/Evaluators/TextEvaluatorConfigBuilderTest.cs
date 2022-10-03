@@ -45,7 +45,7 @@ public class TextEvaluatorConfigBuilderTest
         builder.UseTypeResolver<decimal>(v => string.Empty);
 
         //Act
-        var result = builder!.Build();
+        var result = builder.Build();
 
         //Assert
         Assert.NotNull(result);

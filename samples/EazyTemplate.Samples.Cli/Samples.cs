@@ -105,7 +105,7 @@ public static class Samples
         templateBuilder.AppendLine("Configured DateTime: (((root.ExampleDate###");
         templateBuilder.AppendLine("Configured Boolean True: (((root.ExampleBoolOne###");
         templateBuilder.AppendLine("Configured Boolean False: (((root.ExampleBoolTwo###");
-        templateBuilder.Append("Unknown example is empty string: \"(((root.NonExistant###\"");
+        templateBuilder.Append("Unknown example is empty string: \"(((root.NonExistent###\"");
         var textTemplate = templateBuilder.ToString();
 
         var testObject = new
@@ -118,7 +118,7 @@ public static class Samples
         var textBuilder = new TextBuilder();
         textBuilder.UseParametersConfiguration(cfg =>
         {
-            cfg.UseOpeninAndClosingRegex(@"\(\(\(", @"###");
+            cfg.UseOpeningAndClosingRegex(@"\(\(\(", @"###");
             cfg.UseEmptyStringForUnKnownProperties();
         });
 
