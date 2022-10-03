@@ -42,7 +42,7 @@ Another configuration is for opening and closing regex, used to find parameters 
 ```
 After configuration, all that is needed is to pass the text template and object that populates it. This is why eazy template is called **eazy**. Nothing more to have in the code. No Regex, no reflection to handle. :blush:
 
-Full usage example. For more examples take a look at [samples](/samples/EazyTemplate.Samples.Cli) created for demonstration purposes.
+Full usage example. For more examples take a look at the [samples](/samples/EazyTemplate.Samples.Cli) created for demonstration purposes.
 ```csharp
     var textTemplate = "This is our simple parameter [[[root.SimpleParameter]]]";
 
