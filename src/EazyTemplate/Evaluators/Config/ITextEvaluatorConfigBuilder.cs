@@ -1,5 +1,6 @@
 ﻿namespace EazyTemplate.Evaluators.Config;
 
+/// <inheritdoc />
 internal interface ITextEvaluatorConfigBuilder : ITextEvaluatorConfigurator
 {
     /// <summary>

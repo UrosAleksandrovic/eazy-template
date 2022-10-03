@@ -6,6 +6,7 @@ using static EazyTemplate.Core.Constants;
 
 namespace EazyTemplate.Parameters;
 
+/// <inheritdoc />
 public class SimpleTextParameter : TextParameter
 {
     internal SimpleTextParameter(

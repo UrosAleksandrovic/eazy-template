@@ -1,5 +1,6 @@
 ﻿namespace EazyTemplate.Parameters.Config;
 
+/// <inherithdoc />
 internal interface IParametersConfigBuilder : IParametersConfigurator
 {
     /// <summary>
