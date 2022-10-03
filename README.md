@@ -19,15 +19,17 @@ In order to populate a template, you need to instantiate TextBuilder. TextBuilde
 
     textBuilder.UseTextEvaluatorConfig(cfg =>
     {
-        cfg.UseTypeResolver(value => ((bool)value) ? "Yes" : "No");
+        cfg.UseTypeResolver<bool>(value => value ? "Yes" : "No");
+        cfg.UseTypeResolver<DateTime>(value => value.ToString("dd/MMM/yyyy z"));
     });
 
     textBuilder.UseParametersConfiguration(cfg =>
     {
         cfg.UseOpeningAndClosingRegex(@"\(\(\(",@"\)\)\)");
+        cfg.UseEmptyStringForUnKnownProperties();
     });
 ```
-In the code example above, textBuilder is configured to handle boolean type of properties in a certain way. By default, ToString() is called any property that is in a text template.
+In the code example above, textBuilder is configured to handle boolean type properties in a certain way. By default, ToString() is called on any property that is in a text template.
 
 Another configuration is for opening and closing regex, used to find parameters in the text. By default, parameters are opened with **[[[** and closed with **]]]** but as the example shows, this is configurable to anything really. ex. **(((** and **)))**
 
@@ -40,19 +42,19 @@ After configuration, all that is needed is to pass the text template and object 
 
 ## Preparing template
 
-When populating a template, well, the first thing needed is a template. What is referred as template is any text (string) that does or does not have parameters inside. Parameters need to have **opening**, **closing**, **owner name** and **property name**. Additionally, some parameters may have their own respective template (these are called complex parameters).
+When populating a template, well, the first thing needed is a template. What is referred as template is any text (string) that does or does not have parameters inside. Template could come in many forms, plain text, json, html etc. Parameters need to have **opening**, **closing**, **owner name** and **property name**. Additionally, some parameters may have their own respective template (these are called complex parameters).
 
 Here is some of the most important information for you:
 
 - By default, parameter opening and closing are declared as follows *[[[* *]]]*.
 - Every parameter has to have a parent.
-- The object passed to Build function is referred as a root in the template. Every parameter that comes from it has to follow '[[[root.**propName**]]]'
+- The object passed to Build function is referred as a root in the template. Root object is owner of all first level parameters. Every parameter that comes from it has to follow '[[[root.**propName**]]]'
 
 #### Simple parameters
 
 Simple parameters are properties that are of C# built in types. Essentially leaves of object trees. You declare them as *[[[parentName.propName]]]*
 
-By default all properties that might be in a template that builder cannot find will be returned as they are and template wont be populated on their place. To override this setting, *UseEmptyStringForUnKnownProperties()* of *ParameterConfigBulder* can be used. This instructs builder to populate unknown parameters with empty string.
+By default all properties that might be in a template that builder cannot find will be returned as they are and template wont be populated on their place. This makes it eazy to apply multiple root objects to the same template in sequence. To override this setting, *UseEmptyStringForUnKnownProperties()* of *ParameterConfigBulder* can be used. This instructs builder to populate unknown parameters with empty string.
 
 #### Complex parameters
 
@@ -62,3 +64,8 @@ Complex parameters are parameters that have a template of their own. You can ima
 
 >*[[[root.Items as item: item.Name, item.Price, item.Qty :root.Items]]]*
 
+In the example above, list of items will be iterated and for each item in the list template will be populated.
+
+## Try it out yourself!
+
+If you want to try out package, just clone it and hop into /samples directory where some of basic examples are created to introduce package to you! Feel free to contribute. :raised_hands:
