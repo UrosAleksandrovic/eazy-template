@@ -3,19 +3,22 @@ using EazyTemplate.Evaluators;
 using EazyTemplate.Evaluators.Config;
 using EazyTemplate.Parameters.Config;
 using System.Collections;
-using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace EazyTemplate.Parameters;
 
+/// <summary>
+/// Represents complex text parameter caught in the template. Complex parameters have their own template.
+/// </summary>
 public class ComplexTextParameter : TextParameter, ITextEvaluator
 {
     private readonly ITextParameterFactory _parameterFactory;
 
-    public string TextTemplate { get; private set; }
+    private string TextTemplate { get; }
 
-    public string DeclaredName { get; private set; }
+    private string DeclaredName { get; }
 
     public ComplexTextParameter(
         string fullPath,
@@ -74,7 +77,9 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
 
         if (propType!.IsAssignableTo(typeof(IEnumerable)))
         {
-            var enumGenericType = propType.GetGenericArguments().Single();
+            var enumGenericType = propType.IsArray 
+                    ? propType.GetElementType()!
+                    : propType.GetGenericArguments().Single();
             foreach (var singleObject in ((IEnumerable)complexObject).Cast<object>())
                 parameterValues.AddRange(GetNestedValues(singleObject, orderedParameters, enumGenericType));
         }
@@ -118,6 +123,9 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         return (currentObject, currentType);
     }
 
+    [SuppressMessage(
+        "Major Code Smell", "S2589:Boolean expressions should not be gratuitous",
+        Justification = "False positive")]
     public List<TextParameter> GetOrderedChildParameters()
     {
         var simpleEnumerator = GetSimpleChildrenEnumerator();
@@ -153,7 +161,7 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         return parameters;
     }
 
-    protected IEnumerator<SimpleTextParameter> GetSimpleChildrenEnumerator()
+    private IEnumerator<SimpleTextParameter> GetSimpleChildrenEnumerator()
     {
         if (string.IsNullOrWhiteSpace(TextTemplate))
             throw new EazyTemplateException("No text template is provided.");
@@ -173,7 +181,7 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         }
     }
 
-    protected IEnumerator<ComplexTextParameter> GetComplexChildrenEnumerator()
+    private IEnumerator<ComplexTextParameter> GetComplexChildrenEnumerator()
     {
         if (string.IsNullOrWhiteSpace(TextTemplate))
             throw new EazyTemplateException("No text template is provided.");
@@ -193,7 +201,7 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         }
     }
 
-    protected List<string> GetNestedValues(object root, IEnumerable<TextParameter> textParameters, Type rootType)
+    private List<string> GetNestedValues(object root, IEnumerable<TextParameter> textParameters, Type rootType)
     {
         var stringResults = new List<string>();
         var lastEndingIndex = 0;
@@ -212,11 +220,12 @@ public class ComplexTextParameter : TextParameter, ITextEvaluator
         return stringResults;
     }
 
-    protected string ConstructEndResult(IEnumerable<string> paramValues)
+    private string ConstructEndResult(IEnumerable<string> paramValues)
     {
         var stringBuilder = new StringBuilder();
         foreach (var value in paramValues)
             stringBuilder.Append(value);
+
         return stringBuilder.ToString();
     }
 }

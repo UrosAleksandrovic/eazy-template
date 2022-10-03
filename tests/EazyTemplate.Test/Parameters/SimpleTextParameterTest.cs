@@ -274,7 +274,7 @@ public class SimpleTextParameterTest
         var path = "root.Id";
         var parameter = new SimpleTextParameter(path, 0, path.Length + 6, _paramConfig, _evaluatorConfig);
         var entity = new TestEntity("SomeId");
-        var expectedResult = _evaluatorConfig.GetForBuiltInType(entity.Id.GetType()).Invoke(entity.Id);
+        var expectedResult = _evaluatorConfig.GetForBuiltInType(entity.Id.GetType()).GetResolver().Invoke(entity.Id);
 
         //Act
         var result = parameter.Evaluate(entity, typeof(TestEntity));

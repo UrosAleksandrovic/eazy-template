@@ -2,6 +2,7 @@
 using EazyTemplate.Evaluators.Config;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Xunit;
 
 namespace EazyTemplate.Test.Evaluators;
@@ -12,40 +13,50 @@ public class TextEvaluatorConfigTest
     public void GetForBuiltInType_HasRegisteredFunction_FindsProperFunction()
     {
         //Arrange
-        var expectedFunction = (object value) => value?.ToString();
-        var listOfFunctions = new List<(Type, Func<object, string>)>();
-        listOfFunctions.Add((typeof(int), expectedFunction));
+        var expectedFunction = (DateTime value) => value.ToString(CultureInfo.InvariantCulture);
+        var listOfResolvers = new List<ITextEvaluatorWrapper>();
+        listOfResolvers.Add(new TextEvaluatorWrapper<DateTime>(expectedFunction));
+        var evaluatorConfig = new TextEvaluatorConfig(listOfResolvers);
+        var testDate = DateTime.UtcNow;
 
-        var evaluatorConfig = new TextEvaluatorConfig(listOfFunctions);
+        //Act
+        var expectedResult = expectedFunction.Invoke(testDate);
+        var foundWrapper = evaluatorConfig.GetForBuiltInType(typeof(DateTime));
+        Assert.NotNull(foundWrapper);
+        var result = foundWrapper.GetResolver().Invoke(testDate);
 
         //Assert
-        Assert.StrictEqual(expectedFunction, evaluatorConfig.GetForBuiltInType(typeof(int)));
+        Assert.Equal(expectedResult, result);
     }
 
     [Fact]
     public void GetForBuiltInType_DoesNotHaveRegisteredFunction_GetsDefaultAction()
     {
         //Arrange
-        var expectedFunction = (object value) => value?.ToString();
-        var listOfFunctions = new List<(Type, Func<object, string>)>();
+        var expectedFunction = (DateTime value) => string.Empty;
+        var listOfResolvers = new List<ITextEvaluatorWrapper>();
 
-        var evaluatorConfig = new TextEvaluatorConfig(listOfFunctions);
+        var evaluatorConfig = new TextEvaluatorConfig(listOfResolvers);
+        var testDate = DateTime.UtcNow;
 
         //Act
-        var foundFunction = evaluatorConfig.GetForBuiltInType(typeof(string));
+        var expectedResult = expectedFunction.Invoke(testDate);
+        var foundWrapper = evaluatorConfig.GetForBuiltInType(typeof(DateTime));
+        Assert.NotNull(foundWrapper);
+        var result = foundWrapper.GetResolver().Invoke(testDate);
 
         //Assert
-        Assert.NotNull(foundFunction);
-        Assert.NotEqual(expectedFunction, foundFunction);
+        Assert.NotNull(foundWrapper);
+        Assert.NotEqual(expectedResult, result);
     }
 
     [Fact]
     public void Constructor_TypeIsNotSupported_Exception()
     {
         //Arrange
-        var expectedFunction = (object value) => value?.ToString();
-        var listOfFunctions = new List<(Type, Func<object, string>)>();
-        listOfFunctions.Add((typeof(Type), expectedFunction));
+        var expectedFunction = (Type value) => value?.ToString();
+        var listOfFunctions = new List<ITextEvaluatorWrapper>();
+        listOfFunctions.Add(new TextEvaluatorWrapper<Type>(expectedFunction));
 
         //Act
         void a() => new TextEvaluatorConfig(listOfFunctions);
@@ -58,32 +69,15 @@ public class TextEvaluatorConfigTest
     public void Constructor_TypeIsAlreadyRegistered_Exception()
     {
         //Arrange
-        var expectedFunction = (object value) => value?.ToString();
-        var listOfFunctions = new List<(Type, Func<object, string>)>();
-        listOfFunctions.Add((typeof(int), expectedFunction));
-        listOfFunctions.Add((typeof(int), expectedFunction));
+        var expectedFunction = (int value) => value.ToString();
+        var listOfFunctions = new List<ITextEvaluatorWrapper>();
+        listOfFunctions.Add(new TextEvaluatorWrapper<int>(expectedFunction));
+        listOfFunctions.Add(new TextEvaluatorWrapper<int>(expectedFunction));
 
         //Act
         void a() => new TextEvaluatorConfig(listOfFunctions);
 
         //Assert
         Assert.Throws<EazyTemplateException>(a);
-    }
-
-    [Fact]
-    public void Constructor_NewTypeIsPassed_FunctionRegistered()
-    {
-        //Arrange
-        var expectedFunction = (object value) => value?.ToString();
-        var listOfFunctions = new List<(Type, Func<object, string>)>();
-        listOfFunctions.Add((typeof(int), expectedFunction));
-        listOfFunctions.Add((typeof(DateTime), expectedFunction));
-
-        //Act
-        var result = new TextEvaluatorConfig(listOfFunctions);
-
-        //Assert
-        Assert.NotNull(result.GetForBuiltInType(typeof(int)));
-        Assert.NotNull(result.GetForBuiltInType(typeof(DateTime)));
     }
 }

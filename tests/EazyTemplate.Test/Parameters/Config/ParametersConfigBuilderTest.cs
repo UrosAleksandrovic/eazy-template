@@ -10,7 +10,7 @@ public class ParametersConfigBuilderTest
     {
         //Arrange
         var customBuilder = new ParametersConfigBuilder();
-        customBuilder.UseOpeninAndClosingRegex(@"\(\(\(", @"\)\)\)");
+        customBuilder.UseOpeningAndClosingRegex(@"\(\(\(", @"\)\)\)");
 
         //Act
         var result = customBuilder.Build();
@@ -26,7 +26,7 @@ public class ParametersConfigBuilderTest
         //Arrange
         var customBuilder = new ParametersConfigBuilder();
         var defaultBuilder = new ParametersConfigBuilder();
-        customBuilder.UseOpeninAndClosingRegex(null, null);
+        customBuilder.UseOpeningAndClosingRegex(null, null);
 
         //Act
         var expectedResult = defaultBuilder.Build();
@@ -43,7 +43,7 @@ public class ParametersConfigBuilderTest
         //Arrange
         var customBuilder = new ParametersConfigBuilder();
         var defaultBuilder = new ParametersConfigBuilder();
-        customBuilder.UseOpeninAndClosingRegex("SomeRegex", null);
+        customBuilder.UseOpeningAndClosingRegex("SomeRegex", null);
 
         //Act
         var expectedResult = defaultBuilder.Build();

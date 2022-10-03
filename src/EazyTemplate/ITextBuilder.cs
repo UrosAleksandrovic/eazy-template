@@ -23,10 +23,10 @@ public interface ITextBuilder
     /// <summary>
     /// Configures parameters config.
     /// </summary>
-    void UseParametersConfiguration(Action<IParametersConfigBuilder> configBuilder);
+    void UseParametersConfiguration(Action<IParametersConfigurator> configBuilder);
 
     /// <summary>
     /// Configures evaluators config.
     /// </summary>
-    void UseTextEvaluatorConfig(Action<ITextEvaluatorConfigBuilder> configBuilder);
+    void UseTextEvaluatorConfig(Action<ITextEvaluatorConfigurator> configurator);
 }

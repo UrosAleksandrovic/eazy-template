@@ -2,11 +2,11 @@
 using EazyTemplate.Evaluators.Config;
 using EazyTemplate.Parameters.Config;
 using System.Collections;
-using System.Reflection;
 using static EazyTemplate.Core.Constants;
 
 namespace EazyTemplate.Parameters;
 
+/// <inheritdoc />
 public class SimpleTextParameter : TextParameter
 {
     internal SimpleTextParameter(
@@ -69,7 +69,7 @@ public class SimpleTextParameter : TextParameter
     private string GetPropertyValue(object root, Type rootType)
     {
         if (SupportedTypes.Contains(rootType) && Name.ToLowerInvariant() == "value")
-            return ResolverConfig.GetForBuiltInType(rootType).Invoke(root);
+            return ResolverConfig.GetForBuiltInType(rootType).GetResolver().Invoke(root);
 
         var (evaluatedObject, evaluatedType) = FindSimpleProperty(root, rootType);
         var propNotFound = evaluatedObject == null && evaluatedType == null;
@@ -80,6 +80,6 @@ public class SimpleTextParameter : TextParameter
         if (propNotFound)
             return ParameterText;
 
-        return ResolverConfig.GetForBuiltInType(evaluatedType!).Invoke(evaluatedObject);
+        return ResolverConfig.GetForBuiltInType(evaluatedType!).GetResolver().Invoke(evaluatedObject!);
     }
 }

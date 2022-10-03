@@ -1,15 +1,20 @@
 ﻿namespace EazyTemplate.Evaluators.Config;
 
+/// <inheritdoc />
 public class TextEvaluatorConfigBuilder : ITextEvaluatorConfigBuilder
 {
-    private readonly List<(Type, Func<object?, string>)> _builtInTypeResolvers = new();
+    private readonly List<ITextEvaluatorWrapper> _builtInTypeResolvers = new();
 
-    public IReadOnlyList<Type> RegisteredTypes => _builtInTypeResolvers.Select(v => v.Item1).ToList().AsReadOnly();
-
+    /// <summary>
+    /// Gets all already registered types for the builder.
+    /// </summary>
+    public IReadOnlyList<Type> RegisteredTypes => 
+        _builtInTypeResolvers.Select(v => v.GetResolverType()).ToList().AsReadOnly();
+    
+    /// <inheritdoc />
     public TextEvaluatorConfig Build() => new(_builtInTypeResolvers);
 
-    public void UseTypeResolver<T>(Func<object?, string> typeResolver)
-    {
-        _builtInTypeResolvers.Add((typeof(T), typeResolver));
-    }
+    /// <inheritdoc />
+    public void UseTypeResolver<T>(Func<T, string> typeResolver) 
+        => _builtInTypeResolvers.Add(new TextEvaluatorWrapper<T>(typeResolver));
 }

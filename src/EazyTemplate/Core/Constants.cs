@@ -21,9 +21,4 @@ internal static class Constants
         typeof(string),
         typeof(DateTime)
     };
-
-    public static readonly Type[] SupportedEnumerableTypes =
-    {
-        typeof(string)
-    };
 }
